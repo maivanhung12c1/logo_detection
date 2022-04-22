@@ -9,8 +9,8 @@ import uuid
 user = "mvh"
 passw = "123"
 host = "img_data"
-client = pymongo.MongoClient(username=user, password=passw, host=host)
-#client = pymongo.MongoClient()
+#client = pymongo.MongoClient(username=user, password=passw, host=host)
+client = pymongo.MongoClient()
 db = client["mydata"]
 images = db["images"]
 
@@ -31,11 +31,10 @@ class MainHandler(tornado.web.RequestHandler):
 
     def get_template_namespace(self):
         ns = super(MainHandler, self).get_template_namespace()
-        variable = self.encode_img("images/vnflag.png")
+        default_img = self.encode_img("images/vnflag.png")
         ns.update({
             "img_path": "images/vnflag.png",
-            "variable": variable,
-            "uuid":''
+            "img_base64": default_img,
         })
         return ns
 
@@ -57,14 +56,14 @@ class MainHandler(tornado.web.RequestHandler):
             if image is not None:
                 img = image["image-path"]
                 encoded_img = self.encode_img(img)
-                return self.render("templates/home.html", variable=encoded_img, uuid=image["image-uuid"])
+                return self.render("templates/home.html", img_base64=encoded_img, uuid=image["image-uuid"])
             else:
                 raise tornado.web.HTTPError(404)
         else:
             image = await self.find_image()
             img = image["image-path"]
             encoded_img = self.encode_img(img)
-            return self.render("templates/home.html", variable=encoded_img, uuid=image["image-uuid"])
+            return self.render("templates/home.html", img_base64=encoded_img, uuid=image["image-uuid"])
 
     async def post(self):
         img_file = self.request.files['image'][0]
@@ -82,7 +81,7 @@ class MainHandler(tornado.web.RequestHandler):
         new_image = await self.insert_image(image)
         uploaded_image = await self.find_image(id_image=new_image.inserted_id)
         img_view = self.encode_img(uploaded_image["image-path"])
-        return self.render("templates/home.html", variable=img_view, uuid=image_uuid)
+        return self.render("templates/home.html", img_base64=img_view, uuid=image_uuid)
 
 
 def main():
@@ -95,7 +94,7 @@ def main():
     app.listen(port)
     print("Running")
     for x in images.find():
-        print(x)
+        print(x["image-uuid"])
     tornado.ioloop.IOLoop.current().start()
 
 if __name__ == "__main__":
