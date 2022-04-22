@@ -6,7 +6,7 @@
 - Off line "client = pymongo.MongoClient(username=user, password=passw, host=host)" in app.py
 - On line "client = pymongo.MongoClient()" in app.py
 - Start service: python app.py
-- Now you can load http://localhost:9999 in your browser
+- Now you can load http://localhost:9999 in your browser.
 ### Up docker compose and Run app
 - Up docker compose: docker-compose up -d
-- Now you can load http://localhost:8080 in your browser
+- Now you can load http://localhost:8080 in your browser.
