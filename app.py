@@ -70,18 +70,19 @@ class MainHandler(tornado.web.RequestHandler):
         img_file = self.request.files['image'][0]
         fname = img_file['filename']
         store_location = "images/"
-        path_image = store_location + fname
+        fname = fname.split(".")
+        image_uuid = str(uuid.uuid4().hex)
+        path_image = store_location + fname[0] + image_uuid[0:5] + "." + fname[1]
 
         output_file = open(path_image, 'wb')
         output_file.write(img_file['body'])
-        image_uuid = str(uuid.uuid4().hex)
-        print(image_uuid)
+
         image = {"image-uuid":image_uuid,"image-path":path_image}
         image["_id"] = str(ObjectId())
         new_image = await self.insert_image(image)
         uploaded_image = await self.find_image(id_image=new_image.inserted_id)
         img_view = self.encode_img(uploaded_image["image-path"])
-        self.render("templates/home.html", variable=img_view, uuid=image_uuid)
+        return self.render("templates/home.html", variable=img_view, uuid=image_uuid)
 
 
 def main():
