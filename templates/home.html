@@ -9,7 +9,8 @@
 </head>
 <body style="background-color:black;">
     <div>
-        <img src="data:image/png;base64,{{ img_base64 }}" width="1400" height="500" alt="Red dot" />
+        <img src="data:image/png;base64,{{ img_base64 }}" width="500" height="250" alt="Red dot" />
+        <img src="data:image/png;base64,{{ detected_img64 }}" width="500" height="250" alt="Red dot" />
         <h3 style="color:yellow;">image-uuid: {{ uuid }}</h3>
         <form enctype="multipart/form-data" method="post" action="/">
             <input style="color:yellow;" type="file" name="image" accept=".jpg,.png"/>

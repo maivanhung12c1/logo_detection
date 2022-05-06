@@ -1,14 +1,16 @@
-version: '3.7'
+version: '3.3'
 services:
   mongodb:
     image: mongo
     ports:
-      - 27018:27018
+      - '27017:27017'
     container_name: img_data
     environment:
-      - MONGO_INITDB_DATABASE:mydata
+      - MONGO_INITDB_DATABASE=mydata
       - MONGO_INITDB_ROOT_USERNAME=mvh
       - MONGO_INITDB_ROOT_PASSWORD=123
+    networks:
+      - mongo_net
     volumes:
       - mgdata:/var/lib/mongodb
       - mgdata_config:/etc/mysql
@@ -16,18 +18,21 @@ services:
     build:
       context: .
     ports:
-      - 8080:9999
+      - '8080:8080'
     container_name: updown_img_web
     environment:
       - MONGO_SERVER=mongodb
-      - MONGO_INITDB_DATABASE:mydata
+      - MONGO_INITDB_DATABASE=mydata
       - MONGO_INITDB_ROOT_USERNAME=mvh
       - MONGO_INITDB_ROOT_PASSWORD=123
     depends_on:
       - mongodb
+    networks:
+      - mongo_net
     volumes:
       - ./:/app
-    working_dir: /app
 volumes:
   mgdata:
   mgdata_config:
+networks:
+  mongo_net:
