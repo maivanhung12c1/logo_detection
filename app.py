@@ -56,8 +56,8 @@ class MainHandler(tornado.web.RequestHandler):
             return self.render("templates/home.html", img_base64=encoded_img, uuid=image["image-uuid"])
             return self.render("templates/home.html")
 
-    async def detect_logo(self, encoded_img):
-        detection = logo_detection.LogoDetection(encoded_img)
+    async def detect_logo(self, encoded_img, source, name):
+        detection = logo_detection.LogoDetection(encoded_img, source=source, name=name)
         result = detection.run()
         return result
 
@@ -69,7 +69,8 @@ class MainHandler(tornado.web.RequestHandler):
         store_location = "images/original/"
         fname = fname.split(".")
         image_uuid = str(uuid.uuid4().hex)
-        image_path = store_location + fname[0] + image_uuid[0:5] + "." + fname[1]
+        file_name = fname[0] + image_uuid[0:5]
+        image_path = store_location + file_name + "." + fname[1]
 
         # Create path to save original image
         dt_img_path = image_path.replace("original", "detected")
@@ -86,9 +87,9 @@ class MainHandler(tornado.web.RequestHandler):
         img_view = self.encode_img_data(uploaded_image["image-path"])
 
         # Detect logo in image
-        detect.run(weights="yolov5/best.pt", project="images/detected/", source=image_path)
-        #res = await self.detect_logo(img_view)
-        #print("ket qua: ",res)
+        #detect.run(weights="best.pt", project="images/detected/", source=image_path, name='')
+        res = await self.detect_logo(img_view, source="images/detected/", name=file_name)
+        print("detected result: ",res)
         detected_img = self.encode_img_data(uploaded_image["detected-img-path"])
         return self.render("templates/home.html", img_base64=img_view, uuid=image_uuid, detected_img64=detected_img)
 

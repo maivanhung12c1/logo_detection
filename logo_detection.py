@@ -11,12 +11,14 @@ from yolov5.models.common import DetectMultiBackend
 from yolov5.utils.general import (LOGGER, check_img_size, cv2,
                             non_max_suppression, scale_coords,  xyxy2xywh)
 
-from yolov5.utils.plots import Annotator
+from yolov5.utils.plots import Annotator, colors
 from yolov5.utils.torch_utils import select_device, time_sync
 
 class LogoDetection:
-    def __init__(self,img):
+    def __init__(self,img, name, source):
         self.img = self.decode_base64img(img)
+        self.file_name = name
+        self.source = source
 
     def decode_base64img(self, base64img):
         im = base64.b64decode(base64img)
@@ -24,7 +26,7 @@ class LogoDetection:
         decoded_im = cv2.imdecode(im, cv2.IMREAD_ANYCOLOR)
         return decoded_im
 
-    def run(self, weights="yolov5/best.pt", project="images/detected/", imgsz = (640, 640)):
+    def run(self, weights="best.pt", project="images/detected/", imgsz = (640, 640)):
         detect_list = []
         # Load model
         device = select_device('')
@@ -36,7 +38,7 @@ class LogoDetection:
         print("shape: ",self.img.shape)
         # Padded resize
         im = letterbox(self.img, imgsz, stride=stride, auto=pt)[0]
-
+        im0 = self.img.copy()
         # Convert
         im = im.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
         im= np.ascontiguousarray(im)
@@ -62,8 +64,8 @@ class LogoDetection:
 
         for i, det in enumerate(pred):  # per image
             seen += 1
-            gn = torch.tensor(self.img.shape)[[1, 0, 1, 0]]
-            annotator = Annotator(im, line_width=3, example=str(names))
+            gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]
+            annotator = Annotator(im0, line_width=3, example=str(names))
             if len(det):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(im.shape[2:], det[:, :4], self.img.shape).round()
@@ -71,10 +73,15 @@ class LogoDetection:
                 # Print results
                 for *xyxy, conf, cls in reversed(det):
                     c = int(cls)
+                    label = f'{names[c]} {conf:.2f}'
                     detect_result_per_one = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()
                     detect_result_per_one.insert(0, names[c])
                     detect_result_per_one.insert(1, float(conf))
                     detect_list.append(detect_result_per_one)
+                    annotator.box_label(xyxy, label, color=colors(c, True))
+                    
+        im0 = annotator.result()
+        cv2.imwrite(str(self.source + self.file_name + ".jpg"), im0)
         t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
         sum_t = sum(t)
         LOGGER.info(sum_t)
