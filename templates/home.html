@@ -16,7 +16,7 @@
             <input style="color:yellow;" type="file" name="image" accept=".jpg,.png"/>
             <input type="submit" value="Upload"/>
         </form>
-
+        <p style="color: red;">{{ alert }}</p>
         <form id="uuid_form" method="get" action="/">
             <input type="text" name="image_uuid"/>
             <input type="submit" value="Search" onclick="(change_by_uuid())"/>

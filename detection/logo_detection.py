@@ -26,7 +26,7 @@ class LogoDetection:
         decoded_im = cv2.imdecode(im, cv2.IMREAD_ANYCOLOR)
         return decoded_im
 
-    def run(self, weights="best.pt", project="images/detected/", imgsz = (640, 640)):
+    def run(self, weights="weights/best.pt", project="images/detected/", imgsz = (640, 640)):
         detect_list = []
         # Load model
         device = select_device('')
@@ -81,7 +81,7 @@ class LogoDetection:
                     annotator.box_label(xyxy, label, color=colors(c, True))
                     
         im0 = annotator.result()
-        cv2.imwrite(str(self.source + self.file_name + ".jpg"), im0)
+        cv2.imwrite(str(self.source + self.file_name), im0)
         t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
         sum_t = sum(t)
         LOGGER.info(sum_t)
