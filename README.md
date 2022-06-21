@@ -10,3 +10,8 @@
 ### Up docker compose and Run app
 - Up docker compose: docker-compose up -d
 - Now you can load http://localhost:8080 in your browser.
+## Demo
+
+
+https://user-images.githubusercontent.com/48687271/174758808-8c867177-36f9-46f9-91e4-6ba85620ca33.mp4
+
