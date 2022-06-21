@@ -1,5 +1,5 @@
-# MongoDB with Tornado
- This is a simple project that build an API to upload and download image with MongoDB and Tornado.
+# Logos Detection
+ This is a simple project that build an API to upload, download image and detect logos in image uploaded.
 ## Run app
 ### Run app normally
 - Install requirements: pip install -r requirements.txt
